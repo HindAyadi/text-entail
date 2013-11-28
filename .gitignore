@@ -1,4 +1,13 @@
 *.py[cod]
+run/*.gz
+run/*.xml
+run/dummy*
+run/trash/*
+run/*.class
+run/old/
+glookup/
+data/
+
 
 # C extensions
 *.so
@@ -17,7 +26,6 @@ develop-eggs
 .installed.cfg
 lib
 lib64
-__pycache__
 
 # Installer logs
 pip-log.txt
