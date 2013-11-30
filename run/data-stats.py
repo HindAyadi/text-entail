@@ -25,7 +25,12 @@ for line in sys.stdin:
     counts, bin_range = np.histogram(probs, nbin, [min_range, max_range])
     gcounts += counts
 
-print gcounts.tolist()
-print bin_range
-plt.plot([gcounts, bin_range])
-plt.savefig("dummy.png")
+gcounts_normalized= gcounts / gcounts.sum()
+print gcounts.tolist()[0]
+print gcounts_normalized.tolist()[0]
+print np.log(gcounts+1).tolist()[0]
+print bin_range.tolist()
+#print gcounts.mean(), gcounts_normalized.mean(), np.log(gcounts+1).mean()
+
+#plt.plot([gcounts, bin_range])
+#plt.savefig("dummy.png")
