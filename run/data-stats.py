@@ -8,29 +8,46 @@ __author__ = "Osman Baskaya"
 import sys
 import os
 import numpy as np
-import matplotlib.pyplot as plt
+from nlp_utils import fopen
+#import matplotlib.pyplot as plt
 
-nbin = int(sys.argv[1]) # number of bins
+input_file = sys.argv[1]
+nbin = int(sys.argv[2]) # number of bins
 
-min_range = 0
-max_range = 1
+def find_max_min():
+    
+    max_val = -1000
+    min_val = 1000
+    
+    for line in fopen(input_file):
+        line = line.split()
+        probs = np.array([float(line[i+1]) \
+                                    for i in xrange(1, len(line)-1, 2)])
+        max_prob = probs.max()
+        min_prob = probs.min()
 
-gcounts = np.zeros([1,nbin])
-for line in sys.stdin:
-    line = line.split()
-    tw = line[0]
-    probs = np.array([10**float(line[i+1]) \
-                                for i in xrange(1, len(line)-1, 2)])
-    probs = probs / probs.sum()
-    counts, bin_range = np.histogram(probs, nbin, [min_range, max_range])
-    gcounts += counts
+        if max_val < max_prob:
+            max_val = max_prob
 
-gcounts_normalized= gcounts / gcounts.sum()
-print gcounts.tolist()[0]
-print gcounts_normalized.tolist()[0]
-print np.log(gcounts+1).tolist()[0]
-print bin_range.tolist()
-#print gcounts.mean(), gcounts_normalized.mean(), np.log(gcounts+1).mean()
+        if min_val > min_prob:
+            min_val = min_prob
+    
+    return max_val, min_val
 
-#plt.plot([gcounts, bin_range])
-#plt.savefig("dummy.png")
+def prepare_histogram_data():
+
+    max_range, min_range = find_max_min() 
+    print "{}\t{}\t{}".format(max_range, min_range, nbin) # max,min,#ofbins
+    gcounts = np.zeros([1, nbin])
+    for line in fopen(input_file):
+        line = line.split()
+        probs = np.array([float(line[i+1]) \
+                                    for i in xrange(1, len(line)-1, 2)])
+        counts, bins = np.histogram(probs, nbin, [min_range, max_range])
+        gcounts += counts
+
+    print gcounts.tolist()[0]
+    print np.log(gcounts + 1).tolist()[0]
+    print bins.tolist()
+
+prepare_histogram_data()
