@@ -20,7 +20,7 @@ def get_test_pairs():
     pairs = []
     for line in open(test_pairs):
         w1, w2, tag = line.split()
-        pairs.append((w1, w2))
+        pairs.append((w1, w2, tag))
     return pairs
 
 def get_contexts_above_threshold(threshold=THRESHOLD):
@@ -68,6 +68,15 @@ def entail_score3(s1, s2):
         score = 0
     return score
 
-for w1, w2 in pairs:
+def print_sorted_scores(scores):
+    scores.sort(key=lambda x: x[-1], reverse=True)
+    for s in scores:
+        for e in s:
+            print e,
+        print
+
+scores = []
+for w1, w2, tag in pairs:
     c1, c2 = words[w1], words[w2]
-    print w1, w2, jaccard_index(c1, c2), entail_score1(c1, c2)
+    scores.append((w1, w2, tag, entail_score1(c1, c2)))
+print_sorted_scores(scores)

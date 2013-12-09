@@ -19,8 +19,8 @@ test-words.txt: test.set
 global-T%.ans: wsj.verb.scaled.sub.gz test-words.txt test_set.txt
 	zcat $< | global.py test-words.txt test_set.txt $* > $@
 
-%.plot:
-	python evaluate.py $*.scaled.png -score_file scores/$*.scaled.* --title $*.scaled
+%.png:
+	python evaluate.py $@ -score_file $*.ans --title $*
 
 clean:
 	rm scores.dat
