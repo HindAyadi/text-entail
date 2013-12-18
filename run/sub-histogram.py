@@ -7,25 +7,26 @@ __author__ = "Osman Baskaya"
 """
 
 import sys
-from itertools import izip
+#from itertools import izip
 import matplotlib.pyplot as plt
 import numpy as np
 
 lines = open(sys.argv[1]).readlines()
+max_range, min_range, num_bins = map(round, [float(v) for v in lines[0].split()])
 threshold = float(sys.argv[2])
 count_type = int(sys.argv[3]) # 0 for raw counts, 1 for normalized counts, 2 for log counts
 
 C = map(float, lines[count_type][1:-2].replace(",", "").split())
 #B = map(float, lines[3][1:-2].replace(",", '').split())
-B = np.array(lines[2][1:-2].replace(",", '').split()[:-1], dtype="float")
+B = np.array(lines[-1][1:-2].replace(",", '').split()[:-1], dtype="float")
 
-print len(C), B.shape
+#print len(C), B.shape
 #print B
 
 #threshold = 3
 #C = [6,2,3,5,1,1,5,7,1,1,1,15]
 #B = np.array(range(len(C)))
-#plt.figure(num=None, figsize=(100, 12), dpi=80, facecolor='w', edgecolor='k')
+plt.figure(num=None, figsize=(10, 10), dpi=80, facecolor='w', edgecolor='k')
 
 width= 0.0007
 #fig, ax = plt.subplots()
@@ -33,11 +34,11 @@ ax = plt.axes()
 ax.bar(B, C, width, color='r')
 ax.set_xticks(B+0.0007/2)
 plt.xticks(rotation='vertical')
-#plt.xticks(np.linspace(0,0.1, 501))
-plt.xlabel("Bins")
-plt.ylabel("Log Probabilities")
-plt.title("Histogram on Whole Verb Dataset (Log, Oren Scaling)")
-plt.savefig("dummy.png")
+plt.xticks(np.linspace(min_range -1 , max_range, 21))
+plt.xlabel("Bins (Log scores)")
+plt.ylabel("Counts of Scaled log scores")
+plt.title("Histogram on Whole Verb Dataset (Oren Scaled)")
+plt.savefig("Subs-Scaled-Histogram.png")
 #plt.show()
 
 
