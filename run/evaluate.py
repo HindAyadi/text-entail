@@ -1,16 +1,13 @@
-#! /usr/bin/python
-# -*- coding: utf-8 -*-
-
 import os
 def main():
     res = {}
     for f in args.score_file:
         base = os.path.basename(f)
-        sname = base.split('.')[2]
+        sname = base.split('.')[1]
         scores = get_scores(f)
         total_yesc = sum([1 if t[2] == 'Yes' else 0 for t in scores])
         res[sname] = evalu(scores, total_yesc)
-    plot(res)
+    plot(res, title=args.title)
 
 def plot(results,title='unk'):
     import matplotlib
@@ -42,7 +39,8 @@ def evalu(scores, total_yesc):
             yesc += 1
         recall = yesc / float(total_yesc)
         precision = yesc / float(N)
-        print recall, precision
+        if args.v:
+            print recall, precision
 
         N += 1
         recalls.append(recall)
@@ -65,6 +63,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-score_file", nargs='+')
     parser.add_argument("plot_file")
-    #parser.add_argument("--title")
+    parser.add_argument("-v", action='store_true')
+    parser.add_argument("--title")
     args = parser.parse_args()
     main()

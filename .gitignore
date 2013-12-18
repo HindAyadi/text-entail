@@ -7,6 +7,8 @@ run/*.class
 run/old/
 glookup/
 data/
+run/celex
+run/wsj
 
 
 # C extensions
