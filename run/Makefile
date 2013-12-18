@@ -16,12 +16,15 @@ wsj.verb.scaled.sub.gz: wsj.lm.gz wsj.sub.gz celex.verbs
 test-words.txt: test.set
 	cat test.set | cut -f1-2 | tr '\t' '\n' | sort | uniq > $@
 
-scores/global-T%.ans: wsj.verb.scaled.sub.gz test-words.txt test_set.txt
-	zcat $< | global.py test-words.txt test_set.txt $* > $@
-
 plots/global.png: 
-	python evaluate.py $@ -score_file scores/*.ans --title global-T
+	python evaluate.py $@ -score_file scores/*.ans --title "Global-T0 with various metrics"
 	#python evaluate.py $@ -score_file $*.ans --title $*
+
+scores/global-T0-%.ans: wsj.verb.scaled.sub.gz test-words.txt test_set.txt
+	subs-global.py $^ 0 $* #> $@
+
+global-features1.arff: wsj.verb.scaled.sub.gz test-words.txt test_set.txt
+	feature-extractor.py $^ 0 > $@
 
 clean:
 	rm scores.dat
