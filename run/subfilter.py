@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 """
 # stemmer.pl outputs every wordform spelling in celex and each
 # associated analysis with its lemma, suffix, and count.
@@ -10,14 +9,15 @@ print "$word[$i] $stem[$i] x$pos $wfmor $frq $wf $lm";
 
 from collections import OrderedDict
 import gzip, math
-from builder import LM
+from lm import LM
 
 stem_lookup = {}
 
+"""
 def read_lookup():
     global stem_lookup
     d = {}
-    with open('stem.lookup') as f:
+    with open(args.stemfile) as f:
         for l in f:
             fields = l.strip().split()
             v, stem, freq = fields[0], fields[1], int(fields[2])
@@ -27,33 +27,38 @@ def read_lookup():
                 d[v] = max([d[v],(stem,freq)],key=lambda x:x[1])
     for v, t in d.iteritems():
         stem_lookup[v] = t[0]
-
-def get_verbs(vfile):
-    verbs = {}
-    with open(vfile) as f:
+"""
+def read_lookup():
+    global stem_lookup
+    with open(args.stemfile) as f:
         for l in f:
-            w = l.strip()
-            verbs[w]=True
-    return verbs
+            fields = l.strip().split()
+            stem_lookup[fields[0]] = fields[1]
+
+def get_filter_words(vfile):
+    words = []
+    with open(vfile) as f:
+        words = [l.strip() for l in f]
+    return set(words)
 
 def main():
     read_lookup()
-    verbs = get_verbs(args.verbs_file)
-    if args.scale:
-        lm = LM(args.scale)
+    words = get_filter_words(args.filter_words_file)
+    if args.lm_file:
+        lm = LM(args.lm_file)
     with gzip.GzipFile(args.sub_gz_file) as src, gzip.GzipFile(args.out_sub_gz_file, 'w') as out:
         for l in src:
             fields = l.strip().split()
             w = fields[0]
-            if w in stem_lookup and stem_lookup[w] in verbs:
+            if w in stem_lookup and stem_lookup[w] in words:
                 vec = get_vec(fields)
-                if args.scale:
+                if args.lm_file:
                     scale(vec, lm)
-                if args.stem:
+                if args.stemfile:
                     vec = stem(vec)
 
                 nfields = []
-                if args.stem:
+                if args.stemfile:
                     nfields.append(stem_lookup[w])
                 else:
                     nfields.append(w)
@@ -90,13 +95,13 @@ def stem(vec):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
+    parser.add_argument('filter_words_file', help='consider only the words in file')
     parser.add_argument('sub_gz_file', help='sub.gz file to filter')
-    parser.add_argument('verbs_file', help='consider only these verb\'s subvectors')
     parser.add_argument('out_sub_gz_file', help='sub.gz file to make output')
-    parser.add_argument('--scale', help='scale verbs with unigram prob')
-    parser.add_argument('--stem', action='store_true',help='scale verbs with unigram prob')
+    parser.add_argument('--scale', dest='lm_file', help='scale words with unigram prob')
+    parser.add_argument('--stemfile', help='stemfile')
     args = parser.parse_args()
-    if args.scale or args.stem:
+    if args.lm_file or args.stemfile:
         main()
     else:
         print 'at least use --scale or --stem'

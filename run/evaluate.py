@@ -3,7 +3,7 @@ def main():
     res = {}
     for f in args.score_file:
         base = os.path.basename(f)
-        sname = base.split('.')[1]
+        sname = base.split('.')[2]
         scores = get_scores(f)
         total_yesc = sum([1 if t[2] == 'Yes' else 0 for t in scores])
         res[sname] = evalu(scores, total_yesc)
